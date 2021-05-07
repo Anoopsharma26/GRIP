@@ -1,0 +1,108 @@
+
+# Task 3 of GRIP Internship
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+match_data= pd.read_csv("/content/matches.csv")
+ball_data = pd.read_csv("/content/deliveries.csv")
+print("Succesfully file imported")
+
+print ("Size of the Match  dataset")
+print(match_data.shape)
+ 
+print()
+print()
+print("Size of the Deliveries dataset")
+print(ball_data.shape)
+ 
+ match_data.columns
+# Data Preprocessing
+ match_data.isna().any()
+ print( "\n Null values in Matches datasets  \n")
+print(match_data.isnull().sum())
+
+print( "\n Null values in Deliverires datasets  \n")
+print(ball_data.isnull().sum())
+
+
+match_data.describe()
+
+ball_data.describe()
+ sns.countplot(match_data['season'])
+ plt.xticks(rotation=90 ,fontsize=10)
+ plt.yticks(fontsize=10)
+ plt.xlabel('Season',fontsize=12)
+ plt.ylabel('Count',fontsize=12)
+ plt.title("Total matches played in each season",fontsize=18)
+ 
+ season_data = match_data.groupby(['season'])['id'].count().reset_index().rename(columns={'id':'Matches_played'})
+season_data
+
+season_data= match_data[['id','season']].merge(ball_data,left_on ='id',right_on ='match_id',how ='left').drop('id',axis=1)
+season_data.head()
+
+season= season_data.groupby(['season'])['total_runs'].sum().reset_index()
+p= season.set_index('season')
+ax= plt.axes()
+ax.set(facecolor= "grey")
+sns.lineplot(data= p,palette='magma')
+plt.title("Total runs in each season ", fontsize=12,fontweight='bold')
+plt.show()
+
+
+runs_per_season= pd.concat([season_data, season.iloc[:,1]],axis=1)
+runs_per_season ['runs per matches '] = runs_per_season['total_runs']/ runs_per_season['Matches_played']
+runs_per_season.set_index('season',inplace= False)
+runs_per_season
+
+
+toss = match_data['toss_winner'].value_counts()
+ax=plt.axes()
+ax.set(facecolor= "grey")
+sns.set(rc={'figure.figsize':(15,10)},style= 'darkgrid' )
+ax.set_title('No. of tosses won by each team ', fontsize =15, fontweight='bold')
+sns.barplot(y= toss.index, x=toss, orient= 'h',palette="icefire", saturation=1)
+plt.xlabel(" No. of tosses won ")
+plt.ylabel('Teams')
+plt.show()
+
+ax=plt.axes()
+ax.set(facecolor= "grey")
+sns.countplot(x='season',hue='toss_decision',data =match_data ,palette="magma", saturation=1)     
+plt.xticks(rotation =90 ,fontsize=10)
+plt.yticks(fontsize=15)
+plt.xlabel('\n season', fontsize=15)
+plt.ylabel('Count', fontsize =15)
+plt.title ('Toss decisoin acrooss season',fontsize =15)
+plt.show()
+
+#Does Winning the toss Means Winning the match or not
+
+toss =match_data['toss_winner']== match_data['winner']
+plt.figure(figsize=(10,5))
+sns.countplot(toss)
+plt.show()
+
+
+#Most succesfull IPL team
+data1=data.winner.value_counts()
+sns.barplot(y=data1.index, x= data1)
+
+Highest win by team per season
+match_data.groupby('season')['winner'].value_counts()
+
+#Man of the match - Highest to Lowest(in won match)
+match_data['player_of_match'].value_counts()
+
+runs= ball_data.groupby(['batsman'])['batsman_runs'].sum().reset_index()
+runs.columns=['bastman','runs']
+y=runs.sort_values(by='runs',ascending=False).head(10).reset_index().drop('index',axis=1)
+y  
+
+
+
+
+
+
+
